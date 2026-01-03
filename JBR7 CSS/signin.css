@@ -1,9 +1,16 @@
 * { box-sizing: border-box; margin:0; padding:0; }
 html,body{ height:100%; }
 body{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Use Poppins (loaded from Google Fonts) with fallbacks */
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color:#222;
-    background: url('iridescent-tote-bag-sits-on-a-light-wood-surface-against-a-blue-wall-photo.jpg') no-repeat center/cover fixed;
+    /* Image path corrected: file is at project root as totebag.avif; CSS is in "JBR7 CSS" folder, so go up one level */
+    background-image: url('../Background.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-color: #f6f7f8; /* fallback color if image doesn't load */
     min-height:100vh;
     display:flex;
     align-items:center;
@@ -11,9 +18,6 @@ body{
     padding:2rem;
     position:relative;
 }
-
-/* subtle overlay for contrast */
-body::before{ content:''; position:absolute; inset:0; background:linear-gradient(rgba(0,0,0,0.28), rgba(0,0,0,0.28)); pointer-events:none; }
 
 /* Card */
 .auth-card{
@@ -31,8 +35,7 @@ body::before{ content:''; position:absolute; inset:0; background:linear-gradient
 
 /* Tabs */
 .tabs{ display:flex; gap:14px; justify-content:center; margin-bottom:16px; }
-.tabs::after{ content:''; position:absolute; left:25%; bottom:10px; width:30%; height:3px; background:linear-gradient(90deg,#006923,#34a853); border-radius:3px; opacity:0.12 }
-.tab{ font-weight:700; padding:6px 10px; border-radius:8px; cursor:pointer; color:#2b2b2b }
+
 .tab.active{ color:#006923; background:rgba(0,105,54,0.06) }
 
 /* Form */
@@ -87,27 +90,6 @@ input:focus{ border-color:#88b39d; box-shadow:0 6px 18px rgba(6,97,57,0.08) }
     justify-content: center;
 }
 
-.tabs::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 20%;
-    width: 30%;
-    height: 3px;
-    background: linear-gradient(90deg, #4285f4, #34a853);
-    border-radius: 2px;
-    transition: transform 0.3s ease;
-    left: 25%;
-    width: 30%;
-    height: 3px;
-    background: linear-gradient(90deg,#006923,#34a853);
-    border-radius: 2px;
-    transition: transform 0.28s ease;
-}
-
-.tabs.signup-active::after {
-    transform: translateX(100%);
-}
 
 .tab {
     font-size: 1.5rem;
@@ -329,6 +311,13 @@ input:focus {
     object-fit: contain;
 }
 
+/* alias for consistency with home.html (.logo-img) */
+.logo-img { 
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
 .logo-text {
     display: flex;
     flex-direction: column;
@@ -349,7 +338,7 @@ input:focus {
 
 .brand-name::after {
     content: 'BAGS';
-    color: #eee126;
+    color: #000000;
 }
 
 .brand-tagline {
@@ -358,7 +347,8 @@ input:focus {
     color: #006923;
     letter-spacing: 3px;
     padding-bottom: 3px;
-    border-bottom: 2px solid #000000;
+    /* border matches the brand green from the logo */
+    border-bottom: 2px solid #006923;
 }
 
 /* --- ANIMATIONS --- */

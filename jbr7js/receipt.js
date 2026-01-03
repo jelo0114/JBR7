@@ -33,9 +33,30 @@
   const tbody = document.querySelector('#itemsTable tbody');
   tbody.innerHTML = '';
   
-  const items = data.items || [];
-  console.log('Rendering items:', items);
-  
+  // Be defensive: some deployments may store slightly different keys (price vs unitPrice/basePrice)
+  let items = data.items || [];
+  console.log('Rendering items (raw):', items);
+
+  // Normalize each item so receipt can render even if the source used a different field name
+  items = (items || []).map(it => {
+    const clone = Object.assign({}, it);
+    // try to coerce unitPrice from several possible fields
+    if (typeof clone.unitPrice === 'undefined') {
+      if (typeof clone.price !== 'undefined') clone.unitPrice = parseFloat(String(clone.price).toString().replace(/[^0-9\.-]/g, '')) || 0;
+      else if (typeof clone.basePrice !== 'undefined') clone.unitPrice = Number(clone.basePrice) || 0;
+      else clone.unitPrice = 0;
+    }
+    // quantity fallback
+    clone.quantity = Number(clone.quantity || clone.qty || 1) || 1;
+    // lineTotal fallback
+    if (typeof clone.lineTotal === 'undefined' || !clone.lineTotal) {
+      clone.lineTotal = +(clone.unitPrice * clone.quantity).toFixed(2);
+    }
+    return clone;
+  });
+
+  console.log('Rendering items (normalized):', items);
+
   if (items.length === 0) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
@@ -84,10 +105,29 @@
   }
 
   // Populate totals
-  document.getElementById('subtotal').textContent = fmt(data.subtotal || 0);
-  document.getElementById('shipping').textContent = (data.shipping === 0) ? 'FREE' : fmt(data.shipping || 0);
-  document.getElementById('tax').textContent = fmt(data.tax || 0);
-  document.getElementById('total').textContent = fmt(data.total || 0);
+  // If totals are missing, compute from normalized items
+  let subtotalVal = (typeof data.subtotal !== 'undefined' && data.subtotal) ? Number(data.subtotal) : null;
+  let shippingVal = (typeof data.shipping !== 'undefined') ? Number(data.shipping) : null;
+  let taxVal = (typeof data.tax !== 'undefined' && data.tax) ? Number(data.tax) : null;
+  let totalVal = (typeof data.total !== 'undefined' && data.total) ? Number(data.total) : null;
+
+  if (subtotalVal === null || subtotalVal === 0) {
+    subtotalVal = items.reduce((s,it)=> s + (Number(it.lineTotal) || 0), 0);
+  }
+  if (taxVal === null || taxVal === 0) {
+    taxVal = +(subtotalVal * 0.08).toFixed(2);
+  }
+  if (shippingVal === null) {
+    shippingVal = subtotalVal > 50 ? 0 : 5.99;
+  }
+  if (totalVal === null || totalVal === 0) {
+    totalVal = +(subtotalVal + shippingVal + taxVal).toFixed(2);
+  }
+
+  document.getElementById('subtotal').textContent = fmt(subtotalVal || 0);
+  document.getElementById('shipping').textContent = (shippingVal === 0) ? 'FREE' : fmt(shippingVal || 0);
+  document.getElementById('tax').textContent = fmt(taxVal || 0);
+  document.getElementById('total').textContent = fmt(totalVal || 0);
 
   // Customer info
   const cust = [];

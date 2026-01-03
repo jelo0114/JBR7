@@ -529,12 +529,14 @@ function checkout() {
     };
 
     // persist for receipt page
+    // log checkout data to help debugging in deployment (visible in browser console)
+    try { console.log('Storing pendingCheckout:', checkoutData); } catch (e) { /* ignore */ }
     localStorage.setItem('pendingCheckout', JSON.stringify(checkoutData));
 
     showNotification('Preparing receipt...', 'success');
     // open receipt page immediately
     setTimeout(() => {
-        window.location.href = 'receipt.js';
+        window.location.href = 'receipt.html';
     }, 400);
 }
 

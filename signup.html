@@ -3,39 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JBR7 Bags - Sign In</title>
+    <title>JBR7 Bags - Sign Up</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="JBR7 CSS/signin.css">
-    <link rel="stylesheet" href="JBR7 CSS/home.css">
+    
 </head>
 <body>
     
-    <header>
-        <a href="home.html" class="logo">
-            <img src="JBR7 BAGS LOGO.png" alt="JBR7 BAGS LOGO" class="logo-img" onerror="this.style.display='none'">
-            <div class="logo-text">
-                <h2><span>JBR7</span> BAGS</h2>
-                <span class="sub-logo">MANUFACTURING</span>
-            </div>
-        </a>
-        <div class="header-sep" aria-hidden="true"></div>
-        <nav>
-            <a href="#home" onclick="handleNavigate('home')" data-page="home"><i class="fas fa-home"></i> Home</a>
-            <a href="#explore" onclick="handleNavigate('explore')" data-page="explore"><i class="fas fa-compass"></i> Explore</a>
-            <a href="#saved" onclick="handleNavigate('saved')" data-page="saved"><i class="fas fa-bookmark"></i> Saved</a>
-            <a href="#cart" onclick="handleNavigate('cart')" data-page="cart"><i class="fas fa-shopping-cart"></i> Cart</a>
-            <a href="#contact" onclick="handleNavigate('contact')" data-page="contact"><i class="fas fa-envelope"></i> Contact Us</a>
-            <a href="#settings" onclick="handleNavigate('settings')" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
-            <a href="#search" onclick="handleNavigate('search')" data-page="search"><i class="fas fa-search"></i></a>
-            <a href="#notifications" onclick="handleNavigate('notifications')" data-page="notifications"><i class="fas fa-bell"></i></a>
-            <a href="#messages" onclick="handleNavigate('messages')" data-page="messages"><i class="fas fa-comment"></i></a>
-            <a href="#profile" onclick="handleNavigate('profile')" data-page="profile"><i class="fas fa-user-circle"></i></a>
-        </nav>
-    </header>
+     <div class="logo-container">
+        <img src="JBR7 BAGS LOGO.jpg" alt="JBR7 BAGS LOGO" class="logo-image" onerror="this.style.display='none'">
+
+    <div class="logo-text">
+        <span class="brand-name"></span>
+        <span class="brand-tagline">MANUFACTURING</span>
+    </div>
+</div>
     <div class="auth-card">
         <div class="tabs">
-            <span class="tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</span>
-            <span class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</span>
+           
+            <h2 style="text-align:center;margin-bottom:12px;color:#333;font-size:1.35rem">Sign Up</h2>
+
         </div>
 
         <div id="sign-in-form">
@@ -74,6 +61,10 @@
             <div style="text-align:center;margin-top:0.6rem">
                 <a href="index.html" class="return-home">Return to home</a>
             </div>
+            <div style="text-align:center;margin-top:0.6rem">
+                <span style="color:#333;margin-right:6px">Already have an account?</span>
+                <a href="signin.html" class="return-home">Sign in</a>
+            </div>
         </div>
 
         <div id="sign-up-form">
@@ -106,6 +97,6 @@
    
 
     <script src="JBR7 JS/signup.js"></script>
-    <script src="JBR7 JS/notifications.js"></script>
+
 </body>
 </html>
