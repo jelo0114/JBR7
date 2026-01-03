@@ -5,7 +5,7 @@
   const raw = localStorage.getItem('pendingCheckout');
   if (!raw) {
     // nothing to show, go back to cart
-    window.location.href = 'cart.html';
+    window.location.href = 'JBR7 HTML/cart.html';
     return;
   }
   const data = JSON.parse(raw);
@@ -38,7 +38,7 @@
   if (data.customerPhone) cust.push(data.customerPhone);
   document.getElementById('custContact').textContent = cust.join(' • ') || '—';
 
-  document.getElementById('backBtn').addEventListener('click', ()=>{ window.location.href = 'explore.html'; });
+  document.getElementById('backBtn').addEventListener('click', ()=>{ window.location.href = 'JBR7 HTML/explore.html'; });
 
   function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 })();
