@@ -117,6 +117,30 @@ function toggleSave(button) {
             savedItems.push({ name: productName, price: productPrice, image: productImage });
             localStorage.setItem('savedBags', JSON.stringify(savedItems));
         }
+
+
+        
+
+        // Try server save for authenticated users. If not authenticated, server returns 401 and we silently keep localStorage.
+        try {
+            const payload = { title: productName, image: productImage, price: productPrice };
+            fetch('/jbr7php/save_item.php', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(res => {
+                if (res.status === 401) {
+                    // not authenticated; nothing to do (localStorage used)
+                    return;
+                }
+                return res.json();
+            }).then(json => {
+                // If needed, could update UI based on server response
+            }).catch(e => {
+                console.warn('Server save failed', e);
+            });
+        } catch (e) { console.warn('Save request failed', e); }
     } else {
         showNotification(`${productName} removed from saved items`, 'info');
 
@@ -128,6 +152,22 @@ function toggleSave(button) {
             return true;
         });
         localStorage.setItem('savedBags', JSON.stringify(savedItems));
+
+        // Try server-side removal
+        try {
+            const payload = { title: productName };
+            fetch('/jbr7php/delete_saved_item.php', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(res => {
+                if (res.status === 401) return; // not authenticated
+                return res.json();
+            }).then(json => {
+                // optionally update UI
+            }).catch(e => console.warn('Server remove failed', e));
+        } catch (e) { console.warn('Remove request failed', e); }
     }
 }
 

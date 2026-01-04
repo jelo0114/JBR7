@@ -68,119 +68,126 @@ const productData = {
     }
 };
 
-// Load saved items from localStorage
+// Load saved items from localStorage (prefers server-side when available)
 function loadSavedItems() {
-    const savedItems = JSON.parse(localStorage.getItem('savedBags') || '[]');
-    const savedItemsGrid = document.getElementById('savedItemsGrid');
-    const emptyState = document.getElementById('emptyState');
-    const savedCount = document.getElementById('savedCount');
-    
-    // Update count
-    savedCount.textContent = `${savedItems.length} Saved Item${savedItems.length !== 1 ? 's' : ''}`;
-    
-    // Clear grid
-    savedItemsGrid.innerHTML = '';
-    
-    if (savedItems.length === 0) {
-        emptyState.classList.add('show');
-        savedItemsGrid.style.display = 'none';
-    } else {
-        emptyState.classList.remove('show');
-        savedItemsGrid.style.display = 'grid';
-        
-        savedItems.forEach((entry, index) => {
-            // entry may be a string (legacy) or an object {name, price, image}
-            let itemName = null;
-            let productInfo = null;
-            let info = null;
+    // Prefer server-side saved items when available (authenticated users).
+    const savedItemsFromStorage = JSON.parse(localStorage.getItem('savedBags') || '[]');
+    let savedItems = savedItemsFromStorage;
+        // Attempt to fetch server-synced saved items
+        const tryServer = async () => {
+            try {
+                const res = await fetch('/jbr7php/get_saved_items.php', { credentials: 'same-origin' });
+                if (!res.ok) return null; // not authenticated or server error
+                const j = await res.json();
+                if (j && j.success && Array.isArray(j.items)) {
+                    // convert server rows into the local saved item format
+                    return j.items.map(r => ({ name: (r.title || ''), image: (r.metadata && r.metadata.image) ? r.metadata.image : '', price: r.price }));
+                }
+            } catch (e) {
+                console.warn('Failed to load server saved items', e);
+            }
+            return null;
+        };
 
-            if (typeof entry === 'string') {
-                itemName = entry;
-                productInfo = productData[itemName];
-            } else if (entry && typeof entry === 'object') {
-                itemName = entry.name || 'Unknown';
-                productInfo = productData[itemName];
+        // because loadSavedItems is synchronous for existing code, we first try synchronous path
+        // then, if server returns, we will re-render
+        (async () => {
+            const serverItems = await tryServer();
+            if (serverItems && serverItems.length >= 0) {
+                savedItems = serverItems;
             }
 
-            // Base info: prefer productData when available
-            info = productInfo ? Object.assign({}, productInfo) : {
-                image: 'https://via.placeholder.com/400x300?text=Image+unavailable',
-                description: 'No additional information available for this item.',
-                price: '₱0.00',
-                rating: 0,
-                category: 'Unknown'
-            };
+            const savedItemsGrid = document.getElementById('savedItemsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const savedCount = document.getElementById('savedCount');
 
-            // Overlay any saved object fields (new format)
-            if (entry && typeof entry === 'object') {
-                if (entry.image) info.image = entry.image;
-                if (entry.price) info.price = entry.price;
-            }
+            // Update count
+            savedCount.textContent = `${savedItems.length} Saved Item${savedItems.length !== 1 ? 's' : ''}`;
 
-            // If a centralized prices.json was loaded into window.cachedPrices,
-            // use that retail price when available to display a consistent price.
-            try {
-                const p = window.cachedPrices && window.cachedPrices[itemName];
-                if (p && typeof p.retail === 'number' && isFinite(p.retail)) {
-                    info.price = `₱${Number(p.retail).toFixed(2)}`;
-                }
-            } catch (e) { /* ignore */ }
+            // Clear grid
+            savedItemsGrid.innerHTML = '';
 
-            // Ensure info.price is a formatted currency string for display (handle numeric or numeric-string values)
-            try {
-                if (info && info.price != null) {
-                    const raw = String(info.price).trim();
-                    if (/^[0-9\.]+$/.test(raw)) {
-                        info.price = `₱${Number(raw).toFixed(2)}`;
+            if (savedItems.length === 0) {
+                emptyState.classList.add('show');
+                savedItemsGrid.style.display = 'none';
+            } else {
+                emptyState.classList.remove('show');
+                savedItemsGrid.style.display = 'grid';
+
+                savedItems.forEach((entry, index) => {
+                    // entry may be a string (legacy) or an object {name, price, image}
+                    let itemName = null;
+                    let productInfo = null;
+                    let info = null;
+
+                    if (typeof entry === 'string') {
+                        itemName = entry;
+                        productInfo = productData[itemName];
+                    } else if (entry && typeof entry === 'object') {
+                        itemName = entry.name || 'Unknown';
+                        productInfo = productData[itemName];
                     }
-                }
-            } catch (e) { /* ignore */ }
 
-            const card = createSavedItemCard(itemName, info, index);
-                    // Attach view handler that opens view.html with details
-                    const viewBtn = card.querySelector('.view-btn');
-                    if (viewBtn) {
-                        viewBtn.addEventListener('click', function(e){
-                            e.preventDefault();
-                            // price: try saved numeric, fallback to stripping currency
-                            const priceNumeric = (entry && entry.price) ? String(entry.price).replace(/[^0-9\.]/g,'') : String(info.price || '').replace(/[^0-9\.]/g,'');
-                            viewProduct(itemName, priceNumeric, info.image || '', info.description || '');
-                        });
+                    // Base info: prefer productData when available
+                    info = productInfo ? Object.assign({}, productInfo) : {
+                        image: 'https://via.placeholder.com/400x300?text=Image+unavailable',
+                        description: 'No additional information available for this item.',
+                        price: '₱0.00',
+                        rating: 0,
+                        category: 'Unknown'
+                    };
+
+                    // Overlay any saved object fields (new format)
+                    if (entry && typeof entry === 'object') {
+                        if (entry.image) info.image = entry.image;
+                        if (entry.price) info.price = entry.price;
                     }
+
+                    // If a centralized prices.json was loaded into window.cachedPrices,
+                    // use that retail price when available to display a consistent price.
+                    try {
+                        const p = window.cachedPrices && window.cachedPrices[itemName];
+                        if (p && typeof p.retail === 'number' && isFinite(p.retail)) {
+                            info.price = `₱${Number(p.retail).toFixed(2)}`;
+                        }
+                    } catch (e) { /* ignore */ }
+
+                    // Ensure info.price is a formatted currency string for display (handle numeric or numeric-string values)
+                    try {
+                        if (info && info.price != null) {
+                            const raw = String(info.price).trim();
+                            if (/^[0-9\.]+$/.test(raw)) {
+                                info.price = `₱${Number(raw).toFixed(2)}`;
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+
+                    const card = createSavedItemCard(itemName, info, index);
                     savedItemsGrid.appendChild(card);
-        });
-    }
-}
-
-// Create saved item card
+                });
+            }
+        })();
 function createSavedItemCard(name, info, index) {
     const card = document.createElement('div');
     card.className = 'saved-item-card';
-    card.style.animation = `slideInFromLeft 0.6s ease-out forwards ${index * 0.1}s`;
-    card.style.opacity = '0';
-    
-    // Generate star rating HTML (handle missing/zero ratings)
-    const ratingVal = (typeof info.rating === 'number') ? info.rating : 0;
+
+    const ratingVal = Number(info.rating || 0);
     const fullStars = Math.floor(ratingVal);
     const hasHalfStar = (ratingVal % 1) >= 0.5;
     let starsHTML = '';
+    for (let i = 0; i < fullStars; i++) starsHTML += '<i class="fas fa-star"></i>';
+    if (hasHalfStar) starsHTML += '<i class="fas fa-star-half-alt"></i>';
 
-    for (let i = 0; i < fullStars; i++) {
-        starsHTML += '<i class="fas fa-star"></i>';
-    }
-    if (hasHalfStar) {
-        starsHTML += '<i class="fas fa-star-half-alt"></i>';
-    }
-
+    // Build markup without inline onclicks to avoid quoting issues. We'll wire listeners below.
     card.innerHTML = `
         <div class="saved-item-image">
             <img src="${info.image}" alt="${name}">
-            <button class="remove-btn" onclick="removeSavedItem('${name}')">
+            <button class="remove-btn" title="Remove saved item">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="saved-item-info">
-            <h3>${name}</h3>
+            <h3 class="saved-item-title">${name}</h3>
             <p class="saved-item-description">${info.description}</p>
             <div class="saved-item-meta">
                 <div class="rating">
@@ -192,42 +199,134 @@ function createSavedItemCard(name, info, index) {
             <div class="saved-item-footer">
                 <span class="price">${info.price}</span>
                 <div class="saved-item-actions">
-                    <button class="view-btn" onclick="viewProduct('${name}')">
+                    <button class="view-btn" title="View item">
                         <i class="fas fa-eye"></i> View
                     </button>
-                    <button class="add-to-cart-btn" onclick="addSavedToCart('${name}', '${info.price}', '${info.image}')">
+                    <button class="add-to-cart-btn" title="Add to cart">
                         <i class="fas fa-cart-plus"></i> Add
                     </button>
                 </div>
             </div>
         </div>
     `;
-    
+
+    // Wire up buttons
+    const removeBtn = card.querySelector('.remove-btn');
+    if (removeBtn) removeBtn.addEventListener('click', function (e) { e.preventDefault(); removeSavedItem(name); });
+
+    const viewBtn = card.querySelector('.view-btn');
+    if (viewBtn) viewBtn.addEventListener('click', function (e) { e.preventDefault(); const priceNumeric = String(info.price || '').replace(/[^0-9\.]/g,''); viewProduct(name, priceNumeric, info.image || '', info.description || ''); });
+
+    const addBtn = card.querySelector('.add-to-cart-btn');
+    if (addBtn) addBtn.addEventListener('click', function (e) { e.preventDefault(); addSavedToCart(name, info.price || '', info.image || ''); });
+
     return card;
+}
 }
 
 // Remove saved item
 function removeSavedItem(itemName) {
+    // Try server-side removal first for authenticated users
+    (async () => {
+        try {
+            const res = await fetch('/jbr7php/delete_saved_item.php', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: itemName })
+            });
+
+            if (res.status === 401) {
+                // not authenticated — fall back to localStorage
+                removeFromLocal(itemName);
+                showNotification(`${itemName} removed from saved items`, 'info');
+                loadSavedItems();
+                return;
+            }
+
+            // If server responds OK, try to parse JSON. If parsing fails but status OK, treat as success.
+            let j = null;
+            try { j = await res.json(); } catch (e) { /* non-json but OK */ }
+
+            if (res.ok && (j === null || j.success === true)) {
+                // success from server
+                removeFromLocal(itemName);
+                showNotification(`${itemName} removed from saved items`, 'info');
+                loadSavedItems();
+                return;
+            }
+
+            // If we get here, server returned an error response
+            const err = (j && j.error) ? j.error : `Server returned ${res.status}`;
+            console.warn('Server failed to remove saved item:', err);
+            // still remove locally to keep UI responsive
+            removeFromLocal(itemName);
+            showNotification(`${itemName} removed locally (server error)`, 'info');
+            loadSavedItems();
+        } catch (e) {
+            // network/server failed — fall back to local removal
+            console.warn('Server remove failed, falling back to localStorage', e);
+            removeFromLocal(itemName);
+            showNotification(`${itemName} removed from saved items`, 'info');
+            loadSavedItems();
+        }
+    })();
+}
+
+function removeFromLocal(itemName) {
     let savedItems = JSON.parse(localStorage.getItem('savedBags') || '[]');
-    // Support removal when saved entries are strings or objects {name, ...}
     savedItems = savedItems.filter(item => {
         if (typeof item === 'string') return item !== itemName;
         if (item && typeof item === 'object') return item.name !== itemName;
         return true;
     });
     localStorage.setItem('savedBags', JSON.stringify(savedItems));
-    
-    showNotification(`${itemName} removed from saved items`, 'info');
-    loadSavedItems();
 }
 
 // Clear all saved items
 function clearAllSaved() {
-    if (confirm('Are you sure you want to remove all saved items?')) {
-        localStorage.setItem('savedBags', '[]');
-        showNotification('All saved items cleared', 'info');
-        loadSavedItems();
-    }
+    if (!confirm('Are you sure you want to remove all saved items?')) return;
+
+    // Try to delete server-side saved items for authenticated users, but always
+    // clear localStorage to keep the UI responsive.
+    (async () => {
+        try {
+            const res = await fetch('/jbr7php/delete_all_saved_items.php', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+
+            if (res.status === 401) {
+                // not authenticated — clear local only
+                localStorage.setItem('savedBags', '[]');
+                showNotification('All saved items cleared locally (not signed in)', 'info');
+                loadSavedItems();
+                return;
+            }
+
+            let j = null;
+            try { j = await res.json(); } catch (e) { /* non-json */ }
+
+            if (res.ok && (j === null || j.success === true)) {
+                localStorage.setItem('savedBags', '[]');
+                showNotification('All saved items cleared', 'info');
+                loadSavedItems();
+                return;
+            }
+
+            const err = (j && j.error) ? j.error : `Server returned ${res.status}`;
+            console.warn('Failed to clear server saved items:', err);
+            // still clear locally
+            localStorage.setItem('savedBags', '[]');
+            showNotification('All saved items cleared locally (server error)', 'info');
+            loadSavedItems();
+        } catch (e) {
+            console.warn('Network error clearing all saved items', e);
+            localStorage.setItem('savedBags', '[]');
+            showNotification('All saved items cleared locally (network error)', 'info');
+            loadSavedItems();
+        }
+    })();
 }
 
 // Toggle view (grid/list)

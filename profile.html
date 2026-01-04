@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - JBR7 Bags Manufacturing</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="home.css">
-    <link rel="stylesheet" href="JBR7 CSS/profile.css">
+    <link rel="stylesheet" href="/home.css">
+    <link rel="stylesheet" href="/JBR7 CSS/profile.css">
+    <link rel="stylesheet" href="/JBR7 CSS/settings.css">
 </head>
 <body>
     <header>
-        <a href="home.html" class="logo">
-            <img src="JBR7 BAGS LOGO.jpg" alt="JBR7 BAGS LOGO" class="logo-img" onerror="this.style.display='none'">
+        <a href="/home.html" class="logo">
+            <img src="/JBR7 BAGS LOGO.jpg" alt="JBR7 BAGS LOGO" class="logo-img" onerror="this.style.display='none'">
             <div class="logo-text">
                 <h2><span>JBR7</span> BAGS</h2>
                 <span class="sub-logo">MANUFACTURING</span>
@@ -32,6 +33,7 @@
         </nav>
     </header>
 
+    <!-- Removed meta-refresh so profile.html can be served directly and populated via client-side JS -->
     <div class="profile-container">
         <!-- Profile Header -->
         <div class="profile-header">
@@ -46,9 +48,9 @@
                     </button>
                 </div>
                 <div class="profile-details">
-                    <h1 class="profile-name">John Doe</h1>
-                    <p class="profile-email"><i class="fas fa-envelope"></i> john.doe@example.com</p>
-                    <p class="profile-member-since"><i class="fas fa-calendar-alt"></i> Member since January 2024</p>
+                    <h1 class="profile-name"></h1>
+                    <p class="profile-email"><i class="fas fa-envelope"></i> </p>
+                    <p class="profile-member-since"><i class="fas fa-calendar-alt"></i></p>
                     <div class="profile-actions">
                         <button class="btn-primary" onclick="handleNavigate('settings')">
                             <i class="fas fa-edit"></i> Edit Profile
@@ -68,7 +70,7 @@
                     <i class="fas fa-shopping-bag"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 class="stat-number">24</h3>
+                    <h3 class="stat-number">0</h3>
                     <p class="stat-label">Total Orders</p>
                 </div>
             </div>
@@ -77,7 +79,7 @@
                     <i class="fas fa-bookmark"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 class="stat-number">12</h3>
+                    <h3 class="stat-number">0</h3>
                     <p class="stat-label">Saved Items</p>
                 </div>
             </div>
@@ -86,7 +88,7 @@
                     <i class="fas fa-heart"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 class="stat-number">8</h3>
+                    <h3 class="stat-number">0</h3>
                     <p class="stat-label">Favorites</p>
                 </div>
             </div>
@@ -95,7 +97,7 @@
                     <i class="fas fa-star"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 class="stat-number">15</h3>
+                    <h3 class="stat-number">0</h3>
                     <p class="stat-label">Reviews</p>
                 </div>
             </div>
@@ -127,6 +129,10 @@
                         <i class="fas fa-history"></i>
                         <span>Activity</span>
                     </button>
+                    <button class="profile-menu-item" onclick="showProfileSection('shipping')" data-section="shipping">
+                        <i class="fas fa-truck"></i>
+                        <span>Shipping Addresses</span>
+                    </button>
                     <button class="profile-menu-item logout-item" onclick="handleLogout()">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
@@ -140,14 +146,14 @@
                         <span>Gold Member</span>
                     </div>
                     <div class="loyalty-points">
-                        <h3>2,450</h3>
+                        <h3>0</h3>
                         <p>Loyalty Points</p>
                     </div>
                     <div class="loyalty-progress">
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: 65%;"></div>
                         </div>
-                        <p>550 points to Platinum</p>
+                        <p0/p>
                     </div>
                     <button class="loyalty-btn" onclick="viewRewards()">View Rewards</button>
                 </div>
@@ -168,80 +174,7 @@
                         </div>
                     </div>
 
-                    <div class="orders-list" id="ordersList">
-                        <!-- Order Item 1 -->
-                        <div class="order-item" data-status="delivered">
-                            <div class="order-header">
-                                <div class="order-id">
-                                    <strong>Order #JBR7-2024-001</strong>
-                                    <span class="order-date">December 20, 2024</span>
-                                </div>
-                                <span class="order-status delivered">Delivered</span>
-                            </div>
-                            <div class="order-content">
-                                <img src="https://www.sourceforthegoose.com/cdn/shop/files/Scallop-top-jute-tote.jpg?v=1713019103&width=1080" alt="Product" class="order-image">
-                                <div class="order-details">
-                                    <h3>Premium Jute Tote Bag</h3>
-                                    <p>Quantity: 2 | Color: Blue | Size: Large</p>
-                                    <p class="order-price">₱51.98</p>
-                                </div>
-                            </div>
-                            <div class="order-actions">
-                                <a class="btn-secondary view-btn" href="view.html?title=Premium%20Jute%20Tote%20Bag&price=51.98&img=https%3A%2F%2Fwww.sourceforthegoose.com%2Fcdn%2Fshop%2Ffiles%2FScallop-top-jute-tote.jpg%3Fv%3D1713019103%26width%3D1080&from=profile">View Details</a>
-                                <button class="btn-secondary" onclick="reorder('001')">Reorder</button>
-                                <button class="btn-primary" onclick="leaveReview('001')">Leave Review</button>
-                            </div>
-                        </div>
-
-                        <!-- Order Item 2 -->
-                        <div class="order-item" data-status="shipped">
-                            <div class="order-header">
-                                <div class="order-id">
-                                    <strong>Order #JBR7-2024-002</strong>
-                                    <span class="order-date">December 22, 2024</span>
-                                </div>
-                                <span class="order-status shipped">Shipped</span>
-                            </div>
-                            <div class="order-content">
-                                <img src="https://www.teqler.com/media/_processed_/6/8/csm_T131370_70518ba90d.jpg" alt="Product" class="order-image">
-                                <div class="order-details">
-                                    <h3>Canvas Shopping Bag</h3>
-                                    <p>Quantity: 1 | Color: Black | Custom Logo</p>
-                                    <p class="order-price">₱18.50</p>
-                                </div>
-                            </div>
-                            <div class="order-actions">
-                                <a class="btn-secondary" href="track-order.html?order=002&from=profile">
-                                    <i class="fas fa-map-marker-alt"></i> Track Order
-                                </a>
-                                <a class="btn-secondary view-btn" href="view.html?title=Canvas%20Shopping%20Bag&price=18.50&img=https%3A%2F%2Fwww.teqler.com%2Fmedia%2F_processed_%2F6%2F8%2Fcsm_T131370_70518ba90d.jpg&from=profile">View Details</a>
-                            </div>
-                        </div>
-
-                        <!-- Order Item 3 -->
-                        <div class="order-item" data-status="processing">
-                            <div class="order-header">
-                                <div class="order-id">
-                                    <strong>Order #JBR7-2024-003</strong>
-                                    <span class="order-date">December 25, 2024</span>
-                                </div>
-                                <span class="order-status processing">Processing</span>
-                            </div>
-                            <div class="order-content">
-                                <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500" alt="Product" class="order-image">
-                                <div class="order-details">
-                                    <h3>Leather Messenger Bag</h3>
-                                    <p>Quantity: 1 | Color: Brown | Premium Leather</p>
-                                    <p class="order-price">₱89.99</p>
-                                </div>
-                            </div>
-                            <div class="order-actions">
-                                <a class="btn-secondary view-btn" href="view.html?title=Leather%20Messenger%20Bag&price=89.99&img=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1553062407-98eeb64c6a62%3Fw%3D500&from=profile">View Details</a>
-                                <button class="btn-danger" onclick="cancelOrder('003')">Cancel Order</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    
 
                 <!-- Wishlist Section -->
                 <div class="profile-section" id="wishlist-section" style="display: none;">
@@ -251,47 +184,7 @@
                     </div>
 
                     <div class="wishlist-grid">
-                        <div class="wishlist-item">
-                            <button class="remove-wishlist-btn" onclick="removeFromWishlist(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=500" alt="Product">
-                            <div class="wishlist-info">
-                                <h3>Minimalist Leather Tote</h3>
-                                <p class="wishlist-price">₱38.00</p>
-                                <button class="btn-primary" onclick="moveToCart(this)">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="wishlist-item">
-                            <button class="remove-wishlist-btn" onclick="removeFromWishlist(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <img src="https://images.unsplash.com/photo-1547949003-9792a18a2601?w=500" alt="Product">
-                            <div class="wishlist-info">
-                                <h3>Weekend Duffel Bag</h3>
-                                <p class="wishlist-price">₱95.00</p>
-                                <button class="btn-primary" onclick="moveToCart(this)">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="wishlist-item">
-                            <button class="remove-wishlist-btn" onclick="removeFromWishlist(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <img src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=500" alt="Product">
-                            <div class="wishlist-info">
-                                <h3>Urban Commuter Backpack</h3>
-                                <p class="wishlist-price">₱52.00</p>
-                                <button class="btn-primary" onclick="moveToCart(this)">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                                </button>
-                            </div>
-                        </div>
+                        %%SAVED_ITEMS_HTML%%
                     </div>
                 </div>
 
@@ -485,6 +378,49 @@
                     </div>
                 </div>
 
+                <!-- Shipping Addresses Section -->
+                <div class="profile-section" id="shipping-section" style="display: none;">
+                    <div class="section-header">
+                        <h2>Shipping Addresses</h2>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="address-item">
+                            <div class="address-info">
+                                <strong>Home</strong>
+                                <p>John Doe<br>
+                                123 Main Street, Barangay San Antonio<br>
+                                Makati City, Metro Manila 1200<br>
+                                Philippines<br>
+                                +63 912 345 6789</p>
+                            </div>
+                            <div class="address-actions">
+                                <span class="default-badge">Default</span>
+                                <button class="btn-text" onclick="editAddress()"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn-text" onclick="removeAddress()"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        </div>
+                        <div class="address-item">
+                            <div class="address-info">
+                                <strong>Office</strong>
+                                <p>John Doe<br>
+                                456 Business Ave, BGC<br>
+                                Taguig City, Metro Manila 1630<br>
+                                Philippines<br>
+                                +63 912 345 6789</p>
+                            </div>
+                            <div class="address-actions">
+                                <button class="btn-text" onclick="setDefaultAddress()">Set as Default</button>
+                                <button class="btn-text" onclick="editAddress()"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn-text" onclick="removeAddress()"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        </div>
+                        <button class="btn-primary" onclick="addAddress()">
+                            <i class="fas fa-plus"></i> Add New Address
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -521,11 +457,55 @@
     </footer>
     
 
-    <script src="jbr7js/home.js"></script>
-    <script src="jbr7js/profile.js"></script>
-    <script src="jbr7js/notifications.js"></script>
-    <script src="jbr7js/view-linker.js"></script>
+    <script src="/jbr7js/home.js"></script>
+    <script src="/jbr7js/profile.js"></script>
+    <script src="/jbr7js/settings.js"></script>
+    <script src="/jbr7js/notifications.js"></script>
+    <script src="/jbr7js/view-linker.js"></script>
 
-    
+    <script>
+    // Ensure the profile fetch runs after profile.js loads (idempotent)
+    try {
+        if (typeof fetchSessionAndPopulateProfile === 'function') {
+            fetchSessionAndPopulateProfile();
+        }
+    } catch (e) {
+        console.warn('Failed to trigger profile fetch from profile.html', e);
+    }
+    </script>
+
 </body>
-</html> 
+<script>
+// Minimal helpers used by server-rendered saved items on the profile page.
+function removeFromWishlistByTitle(title) {
+    if (!confirm('Remove "' + decodeURIComponent(title) + '" from saved items?')) return;
+    const payload = { title: decodeURIComponent(title) };
+    fetch('/jbr7php/delete_saved_item.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(res => {
+        if (res.ok) {
+            location.reload();
+        } else {
+            alert('Failed to remove saved item');
+        }
+    }).catch(() => alert('Network error'));
+}
+
+function moveSavedToCart(title, price, image) {
+    try {
+        const item = { name: decodeURIComponent(title), price: decodeURIComponent(price), image: decodeURIComponent(image), quantity: 1 };
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const idx = cart.findIndex(c => c.name === item.name);
+        if (idx > -1) cart[idx].quantity = (cart[idx].quantity || 0) + 1; else cart.push(item);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        // update badge if helper present
+        try { if (window.updateNavBadge) window.updateNavBadge(); else if (typeof updateCartCount === 'function') updateCartCount(); } catch (e) {}
+        alert(item.name + ' added to cart');
+    } catch (e) { console.warn(e); alert('Failed to add to cart'); }
+}
+</script>
+</body>
+</html>

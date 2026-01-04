@@ -35,7 +35,8 @@ function handleNavigate(page) {
     // Navigate to different pages
     switch(page) {
         case 'home':
-            window.location.href = 'home.html';
+            // Use the PHP locator when available so pages served through PHP resolve correctly
+            window.location.href = '/jbr7php/home.php';
             break;
         case 'explore':
             window.location.href = 'explore.html';
@@ -77,7 +78,9 @@ function handleNavigate(page) {
             }
             break;
         case 'profile':
-            window.location.href = 'profile.html';
+            // Open the client-side profile page which will fetch session data from PHP
+            // This keeps pages HTML-first and lets `profile.js` populate the placeholders
+            window.location.href = '/profile.html';
             break;
         default:
             console.log('Page not found:', page);
@@ -91,7 +94,19 @@ function handleFooterNavigate(page) {
         link.classList.remove('active');
     });
     
-    event.target.classList.add('active');
+    // Safely resolve clicked element: use event if available, otherwise try to find the footer span matching the page
+    let footerTarget = (typeof event !== 'undefined' && event && event.target) ? event.target : null;
+    if (!footerTarget) {
+        try {
+            footerTarget = document.querySelector(`.footer-section ul li span[onclick*="handleFooterNavigate('${page}')"]`);
+        } catch (e) {
+            footerTarget = document.querySelector('.footer-section ul li span');
+        }
+    }
+    if (footerTarget) {
+        const spanEl = footerTarget.closest ? footerTarget.closest('span') : footerTarget;
+        if (spanEl) spanEl.classList.add('active');
+    }
     
     switch(page) {
         case 'about':
@@ -112,12 +127,16 @@ function handleFooterNavigate(page) {
 function handleSocialClick(platform) {
     const socialIcons = document.querySelectorAll('.social-icons span');
     
-    // Add temporary active state
-    event.target.closest('span').classList.add('active');
-    
-    setTimeout(() => {
-        event.target.closest('span').classList.remove('active');
-    }, 300);
+    // Add temporary active state (safely resolve target)
+    let socialTarget = (typeof event !== 'undefined' && event && event.target) ? event.target : null;
+    if (!socialTarget) socialTarget = document.querySelector('.social-icons span');
+    const socialSpan = socialTarget && socialTarget.closest ? socialTarget.closest('span') : socialTarget;
+    if (socialSpan) {
+        socialSpan.classList.add('active');
+        setTimeout(() => {
+            socialSpan.classList.remove('active');
+        }, 300);
+    }
     
     // Open social media links (use specific Facebook share link provided)
     switch(platform) {
@@ -137,7 +156,9 @@ function handleSocialClick(platform) {
 
 // Set active navigation based on current page
 function setActiveNavigation() {
-    const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'home';
+    // normalize filename by removing common extensions (.html, .php)
+    const raw = window.location.pathname.split('/').pop() || '';
+    const currentPage = (raw.replace(/\.html$|\.php$/i, '') || 'home');
     const navLinks = document.querySelectorAll('nav a');
     
     navLinks.forEach(link => {
@@ -207,7 +228,70 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    // initialize header using server session (if available)
+    if (typeof initHeaderFromServer === 'function') initHeaderFromServer();
 });
+
+// Fetch session info and update header elements so pages can remain plain HTML
+async function initHeaderFromServer() {
+    try {
+        const res = await fetch('/jbr7php/session_user.php', { credentials: 'same-origin' });
+        if (!res.ok) return; // not authenticated or server error
+        const j = await res.json().catch(() => null);
+        if (!j || !j.success || !j.user) return;
+        const user = j.user;
+        const stats = j.stats || {};
+
+        // update profile link (show logged-in state) - make link point to the static HTML
+        // and replace the original anchor node to remove previously attached event listeners
+        // (those were added earlier to anchors with href^="#"). This lets the link act as a
+        // normal navigation to /profile.html while still using PHP only for data fetching.
+        const profileLink = document.querySelector('nav a[data-page="profile"]');
+        if (profileLink && profileLink.parentNode) {
+            // create a clean clone (cloning attributes/children but not event listeners)
+            const clean = profileLink.cloneNode(true);
+            // remove any inline onclick handlers so navigation is handled by href
+            clean.removeAttribute('onclick');
+            // point to the static HTML profile page
+            clean.setAttribute('href', '/profile.html');
+
+            // create or update badge/avatar on the clean element
+            let badge = clean.querySelector('.user-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'user-badge';
+                badge.title = user.username || 'Account';
+                badge.style.cssText = 'display:inline-block;margin-left:6px;width:26px;height:26px;border-radius:100%;background:#0a7e3a;color:#fff;text-align:center;font-size:12px;line-height:26px;';
+                badge.textContent = (user.username || 'U').charAt(0).toUpperCase();
+                clean.appendChild(badge);
+            } else {
+                badge.title = user.username || badge.title;
+                badge.textContent = (user.username || 'U').charAt(0).toUpperCase();
+            }
+
+            // replace DOM node so earlier nav click listeners (that call preventDefault)
+            // are not attached to this element anymore — clicking will follow /profile.html
+            profileLink.parentNode.replaceChild(clean, profileLink);
+        }
+
+        // update saved count badge if present
+        if (typeof stats.saved !== 'undefined') {
+            const savedLink = document.querySelector('nav a[data-page="saved"]');
+            if (savedLink) {
+                let sb = savedLink.querySelector('.saved-badge');
+                if (!sb) {
+                    sb = document.createElement('span'); sb.className = 'saved-badge'; sb.style.cssText = 'margin-left:6px;background:#111;color:#fff;padding:2px 6px;border-radius:10px;font-size:11px;';
+                    savedLink.appendChild(sb);
+                }
+                sb.textContent = stats.saved;
+                sb.style.display = stats.saved > 0 ? 'inline-block' : 'none';
+            }
+        }
+    } catch (e) {
+        // ignore silently — header remains as static HTML
+        console.warn('Header init failed', e);
+    }
+}
 
 /* Header inline search toggle
    - clicking the search icon transforms it into a search input

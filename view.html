@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Product View - JBR7 Bags</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="JBR7 CSS/home.css">
+    <link rel="stylesheet" href="/home.css">
     <style>
         /* Scoped styles for view page */
         /* Image zoom modal */
@@ -39,7 +39,7 @@
 <body>
 
 <header>
-    <a href="home.html" class="logo">
+    <a href="/home.html" class="logo">
         <img src="JBR7 BAGS LOGO.jpg" alt="JBR7 BAGS LOGO" class="logo-img" onerror="this.style.display='none'">
         <div class="logo-text">
             <h2><span>JBR7</span> BAGS</h2>
@@ -96,8 +96,8 @@
     &copy; 2025 JBR7 Bags Manufacturing
 </footer>
 
-<script src="jbr7js/home.js"></script>
-<script src="jbr7js/notifications.js"></script>
+<script src="/jbr7js/home.js"></script>
+<script src="/jbr7js/notifications.js"></script>
 <script>
     // Demo PRODUCTS array; replace or extend to match your catalog
     const PRODUCTS = [
@@ -633,6 +633,26 @@
                 // update saved count UI if present
                 const savedCountEl = document.getElementById('savedCount');
                 if (savedCountEl) savedCountEl.textContent = `${saved.length} Saved Item${saved.length !== 1 ? 's' : ''}`;
+
+                // Try server save (if user signed in)
+                try {
+                    const payload = { title: product.title, image: imgSrc, price: savedPrice };
+                    fetch('/jbr7php/save_item.php', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }).then(res => {
+                        if (res.status === 401) {
+                            // not authenticated - keep client-side saved state
+                            return;
+                        }
+                        return res.json();
+                    }).then(json => {
+                        // optionally show server feedback
+                    }).catch(e => console.warn('Server save failed', e));
+                } catch (e) { console.warn('Save request failed', e); }
+
             } catch (e) { console.error('Save item failed', e); }
         });
 
