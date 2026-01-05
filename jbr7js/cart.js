@@ -431,12 +431,10 @@ function updateSummary() {
     }, 0);
     
     const shipping = subtotal > 50 ? 0 : 5.99;
-    const tax = subtotal * 0.08;
-    const total = subtotal + shipping + tax;
+    const total = subtotal + shipping;
 
     document.getElementById('subtotal').textContent = `₱${subtotal.toFixed(2)}`;
     document.getElementById('shipping').textContent = shipping === 0 ? 'FREE' : `₱${shipping.toFixed(2)}`;
-    document.getElementById('tax').textContent = `₱${tax.toFixed(2)}`;
     document.getElementById('total').textContent = `₱${total.toFixed(2)}`;
     
     // Update item count (number of selected items if any selected, otherwise total quantity)
@@ -491,8 +489,7 @@ function checkout() {
         return sum + (price * item.quantity);
     }, 0);
     const shipping = subtotal > 50 ? 0 : 5.99;
-    const tax = +(subtotal * 0.08).toFixed(2);
-    const total = +(subtotal + shipping + tax).toFixed(2);
+    const total = +(subtotal + shipping).toFixed(2);
 
     // gather payment/courier/customer info from settings if present
     const payment = localStorage.getItem('jbr7_default_payment') || localStorage.getItem('default_payment') || 'Not specified';
@@ -520,7 +517,6 @@ function checkout() {
         items,
         subtotal: +subtotal.toFixed(2),
         shipping: +shipping.toFixed(2),
-        tax: +tax.toFixed(2),
         total: +total.toFixed(2),
         payment,
         courier,
@@ -630,4 +626,3 @@ notificationStyles.textContent = `
     }
 `;
 document.head.appendChild(notificationStyles);
-

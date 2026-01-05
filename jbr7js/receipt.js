@@ -104,29 +104,24 @@
     });
   }
 
-  // Populate totals
+  // Populate totals (NO TAX)
   // If totals are missing, compute from normalized items
   let subtotalVal = (typeof data.subtotal !== 'undefined' && data.subtotal) ? Number(data.subtotal) : null;
   let shippingVal = (typeof data.shipping !== 'undefined') ? Number(data.shipping) : null;
-  let taxVal = (typeof data.tax !== 'undefined' && data.tax) ? Number(data.tax) : null;
   let totalVal = (typeof data.total !== 'undefined' && data.total) ? Number(data.total) : null;
 
   if (subtotalVal === null || subtotalVal === 0) {
     subtotalVal = items.reduce((s,it)=> s + (Number(it.lineTotal) || 0), 0);
   }
-  if (taxVal === null || taxVal === 0) {
-    taxVal = +(subtotalVal * 0.08).toFixed(2);
-  }
   if (shippingVal === null) {
     shippingVal = subtotalVal > 50 ? 0 : 5.99;
   }
   if (totalVal === null || totalVal === 0) {
-    totalVal = +(subtotalVal + shippingVal + taxVal).toFixed(2);
+    totalVal = +(subtotalVal + shippingVal).toFixed(2);
   }
 
   document.getElementById('subtotal').textContent = fmt(subtotalVal || 0);
   document.getElementById('shipping').textContent = (shippingVal === 0) ? 'FREE' : fmt(shippingVal || 0);
-  document.getElementById('tax').textContent = fmt(taxVal || 0);
   document.getElementById('total').textContent = fmt(totalVal || 0);
 
   // Customer info
