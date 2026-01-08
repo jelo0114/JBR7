@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +21,8 @@
         .thumbs img{width:72px;height:72px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent}
         .thumbs img.active{border-color:#006923}
         .product-info h1{margin:0 0 .5rem;font-size:1.9rem}
-        .product-price{color:#006923;font-weight:700;font-size:1.5rem;margin-bottom:.5rem}
+        .product-price{color:#006923;font-weight:700;font-size:1.5rem;margin-bottom:.3rem}
+        .product-quantity{color:#666;font-size:0.95rem;margin-bottom:0.8rem;font-weight:500}
         .product-desc{color:#444;line-height:1.6;margin-bottom:1rem}
         .attributes{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
         .attr{padding:.45rem .8rem;border-radius:8px;border:1px solid #e6e6e6;background:#fff}
@@ -118,6 +120,7 @@
         <div class="product-info">
             <h1 id="productTitle">Product Title</h1>
             <div class="product-price" id="productPrice">₱0.00</div>
+            <div class="product-quantity" id="productQuantity">Quantity: 0</div>
             <div class="product-desc" id="productDesc">Product description will appear here. This area contains materials, dimensions and care instructions.</div>
 
             <div class="attributes" id="attributes"></div>
@@ -188,6 +191,7 @@
 
         <div id="reviewsList"></div>
     </section>
+    
 </main>
 
 <!-- Image modal for zoom -->
@@ -202,14 +206,24 @@
 <script src="jbr7js/home.js"></script>
 <script src="jbr7js/notifications.js"></script>
 <script>
-    // Demo PRODUCTS array
+    // Demo PRODUCTS array with quantities
     const PRODUCTS = [
-        { id: '1', slug: 'eco-jute-tote', title: 'Eco Jute Tote Bag', price: 45.00, imgs: ['totebag.avif', 'Tote Bag/Sizes.jpg', 'Tote Bag/Black.png', 'Tote Bag/Colored.png', 'Tote Bag/White.png'], desc: 'Sustainable jute tote with scallop top design, perfect for everyday use. Size: 40x35cm.', attrs: ['Eco-friendly', 'Cotton straps', 'Machine wash cold'], sizes: [{label:'8x10',price:35},{label:'10x12',price:45},{label:'13x15',price:50},{label:'14x16',price:55}] },
-        { id: '2', slug: 'module-backpack', title: 'Professional Module Backpack', price: 78.00, imgs: ['https://www.teqler.com/media/_processed_/6/8/csm_T131370_70518ba90d.jpg'], desc: 'Multi-compartment backpack with laptop sleeve and water-resistant fabric.', attrs: ['Laptop sleeve', 'Water-resistant', 'Multiple pockets'] },
-        { id: '3', slug: 'canvas-messenger', title: 'Canvas Messenger Bag', price: 62.00, imgs: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500'], desc: 'Classic canvas messenger with adjustable strap and multiple pockets.', attrs: ['Adjustable strap', 'Canvas material', 'One main compartment'] },
-        { id: '4', slug: 'riki-bag', title: 'Riki Bag', price: 38.00, imgs: ['Riki Bag/Riki.jpg','Riki Bag/View1.jpg','Riki Bag/View2.jpg','Riki Bag/View3.jpg'], desc: 'Minimalist Riki bag with clean lines and durable material.', attrs: ['Minimalist', 'Durable', 'Lightweight'] },
-        { id: '5', slug: 'ringlight-bag', title: 'Ringlight Bag', price: 500.00, imgs: ['Ringlight/Sizes.jpg','Ringlight/Bag1.jpg'], desc: 'Protective bag designed to fit ring lights. Choose the size for 45cm or 55cm ring lights.', attrs: ['Padded interior','Zipper closure'], sizes: [{label:'18x21',price:500},{label:'22x22',price:550}] },
-        { id: '6', slug: 'vanity-mirror-bag', title: 'Vanity Mirror Bag', price: 400.00, imgs: ['Vanity/Sizes.jpg','Vanity/Bag1.jpg'], desc: 'Padded bag for vanity mirrors. Select size for correct pricing.', attrs: ['Soft lining','Zipper closure'], sizes: [{label:'14x14',price:400},{label:'14x16',price:430},{label:'16x19',price:450},{label:'16x21',price:470},{label:'17x25',price:500},{label:'20x24',price:550},{label:'21x28',price:650}] }
+        { id: '1', slug: 'eco-jute-tote', title: 'Eco Jute Tote Bag', price: 45.00, quantity: 104, imgs: ['totebag.avif', 'Tote Bag/Sizes.jpg', 'Tote Bag/Black.png', 'Tote Bag/Colored.png', 'Tote Bag/White.png'], desc: 'Sustainable jute tote with scallop top design, perfect for everyday use. Size: 40x35cm.', attrs: ['Eco-friendly', 'Cotton straps', 'Machine wash cold'], sizes: [{label:'8x10',price:35},{label:'10x12',price:45},{label:'13x15',price:50},{label:'14x16',price:55}] },
+        { id: '2', slug: 'module-backpack', title: 'Professional Module Backpack', price: 78.00, quantity: 87, imgs: ['https://www.teqler.com/media/_processed_/6/8/csm_T131370_70518ba90d.jpg'], desc: 'Multi-compartment backpack with laptop sleeve and water-resistant fabric.', attrs: ['Laptop sleeve', 'Water-resistant', 'Multiple pockets'] },
+        { id: '3', slug: 'canvas-messenger', title: 'Canvas Messenger Bag', price: 62.00, quantity: 52, imgs: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500'], desc: 'Classic canvas messenger with adjustable strap and multiple pockets.', attrs: ['Adjustable strap', 'Canvas material', 'One main compartment'] },
+        { id: '4', slug: 'riki-bag', title: 'Riki Bag', price: 38.00, quantity: 143, imgs: ['Riki Bag/Riki.jpg','Riki Bag/View1.jpg','Riki Bag/View2.jpg','Riki Bag/View3.jpg'], desc: 'Minimalist Riki bag with clean lines and durable material.', attrs: ['Minimalist', 'Durable', 'Lightweight'] },
+        { id: '5', slug: 'ringlight-bag', title: 'Ringlight Bag', price: 500.00, quantity: 28, imgs: ['Ringlight/Sizes.jpg','Ringlight/Bag1.jpg'], desc: 'Protective bag designed to fit ring lights. Choose the size for 45cm or 55cm ring lights.', attrs: ['Padded interior','Zipper closure'], sizes: [{label:'18x21',price:500},{label:'22x22',price:550}] },
+        { id: '6', slug: 'vanity-mirror-bag', title: 'Vanity Mirror Bag', price: 400.00, quantity: 67, imgs: ['Vanity/Sizes.jpg','Vanity/Bag1.jpg'], desc: 'Padded bag for vanity mirrors. Select size for correct pricing.', attrs: ['Soft lining','Zipper closure'], sizes: [{label:'14x14',price:400},{label:'14x16',price:430},{label:'16x19',price:450},{label:'16x21',price:470},{label:'17x25',price:500},{label:'20x24',price:550},{label:'21x28',price:650}] },
+        { id: '7', slug: 'eco-colored-tote', title: 'Eco Colored Tote Bag', price: 55.00, quantity: 95, imgs: ['Tote Bag/Colored.png'], desc: 'Tote Bag Katsa White, Black and Colored — lightweight, durable, and perfect for everyday use.', attrs: ['Eco-friendly', 'Cotton straps', 'Machine wash cold'] },
+        { id: '8', slug: 'riki-tall-bag', title: 'Riki Tall Bag', price: 850.00, quantity: 61, imgs: ['Riki Bag/Riki.jpg'], desc: 'Size: 29x22 x 1.5 inches', attrs: ['Premium quality', 'Durable', 'Spacious'] },
+        { id: '9', slug: 'plain-brass-backpack', title: 'Plain Brass Cotton Back Pack', price: 180.00, quantity: 119, imgs: ['One/ph-11134207-7ras8-m9txs8bfjp3gc0.jpg'], desc: 'Size: 16.5 x 12 x 4.5 inches Fabric Used: Brass Cotton', attrs: ['Durable', 'Multiple compartments', 'Brass cotton'] },
+        { id: '10', slug: 'two-colored-backpack', title: 'Two Colored Brass Cotton Back Pack', price: 180.00, quantity: 78, imgs: ['Two Color/ph-11134207-7rasg-m9ty0a4dge0z1e.jpg'], desc: 'Size: 16.5 x 12 x 4.5 inches Fabric Used: Brass Cotton', attrs: ['Eco-Friendly', 'Brass cotton', 'Two-tone design'] },
+        { id: '11', slug: 'envelope-bag', title: 'Envelope Bags', price: 70.00, quantity: 82, imgs: ['Envelope Bag/ablue.png'], desc: 'Size 15*12.5inches', attrs: ['Lightweight', 'Secure closure', 'Multiple colors'] },
+        { id: '12', slug: 'boys-kiddie-bag', title: 'Boys Kiddie Bag', price: 140.00, quantity: 134, imgs: ['Boys Kiddie Bag/BOYS.jpg'], desc: 'Sizes: S, M, L', attrs: ['Kid-friendly', 'Durable', 'Fun designs'] },
+        { id: '13', slug: 'girls-kiddie-bag', title: 'Girls Kiddie Bag', price: 140.00, quantity: 91, imgs: ['Girls Kiddie Bag/GIRL.jpg'], desc: 'Sizes: S, M, L', attrs: ['Kid-friendly', 'Durable', 'Fun designs'] },
+        { id: '14', slug: 'katrina-plain', title: 'Katrina Plain', price: 180.00, quantity: 73, imgs: ['Katrina Plain/Copy%20of%20Green%20Grey%20Simple%20Modern%20New%20Arrival%20Instagram%20Post%20(1).png'], desc: 'Size: 16.5 x 12 x 4.5 inches Fabric Used: Brass Cotton', attrs: ['Brass cotton', 'Plain design', 'Versatile'] },
+        { id: '15', slug: 'katrina-two-colors', title: 'Katrina Two Colors', price: 180.00, quantity: 108, imgs: ['Katrina Two Colors/1.png'], desc: 'Size: 16.5 x 12 x 4.5 inches Fabric Used: Brass Cotton', attrs: ['Brass cotton', 'Two-tone', 'Stylish'] },
+        { id: '16', slug: 'module-bag', title: 'Module Bag', price: 90.00, quantity: 126, imgs: ['Module/ph-11134207-7r98r-lxmbqd55abtt7c.avif'], desc: 'Size 15*12.5*3.5 inches Fabric Used: Poly Rubber and PVC Transparent', attrs: ['Transparent design', 'Poly rubber', 'Functional'] }
     ];
 
     // Dummy reviews data
@@ -346,6 +360,7 @@
         if(!product) return;
         document.getElementById('productTitle').textContent = product.title;
         document.getElementById('productPrice').textContent = formatPrice(product.price);
+        document.getElementById('productQuantity').textContent = 'Quantity: ' + (product.quantity || 100);
         document.getElementById('productDesc').textContent = product.desc;
         const main = document.getElementById('mainImg');
         main.src = product.imgs[0] || 'totebag.avif';
@@ -770,7 +785,7 @@
 
                 const idx = stored.findIndex(i => i.name === item.name && i.image === item.image);
                 if (idx > -1) {
-                    stored[idx].quantity = (stored[idx].quantity || 0) + 1;
+                    stored[idx].quantity = (stored[idx].quantity || 100) + 1;
                 } else {
                     stored.push(item);
                 }
